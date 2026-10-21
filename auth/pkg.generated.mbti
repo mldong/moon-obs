@@ -1,0 +1,120 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "mldong/moon-obs/auth"
+
+import {
+  "mldong/moon-obs/error",
+}
+
+// Values
+pub let algorithm : String
+
+pub fn authorization_of(String, String, String, String) -> String
+
+pub fn canonical_headers(Array[(String, String)]) -> HeaderBlock raise @error.ObsError
+
+pub fn canonical_query_string(Array[(String, String)]) -> String
+
+pub fn canonical_request(RequestToSign) -> String raise @error.ObsError
+
+pub fn canonical_uri(bucket? : String, key? : String, path_style? : Bool) -> String
+
+pub fn date_stamp(Int64) -> String raise @error.ObsError
+
+pub let default_header_prefix : HeaderPrefix
+
+pub fn encode_item(String, keep_slash? : Bool) -> String
+
+pub fn encode_object_key(String) -> String
+
+pub fn iso8601_basic(Int64) -> String raise @error.ObsError
+
+pub fn normalize_header_value(String) -> String
+
+pub fn now_millis() -> Int64
+
+pub fn presign_v4(String, String, String, String, Int64, RequestToSign) -> PresignedUrl raise @error.ObsError
+
+pub fn required_headers(String, prefix? : HeaderPrefix) -> Array[(String, String)]
+
+pub fn scope_of(String, String) -> String
+
+pub fn sign_v4(String, String, String, String, RequestToSign) -> Signature raise @error.ObsError
+
+pub fn sign_with_required_headers(String, String, String, String, RequestToSign, header_prefix? : HeaderPrefix) -> Signature raise @error.ObsError
+
+pub fn signature_of(String, String, String, String) -> String
+
+pub fn signed_header_list(Array[String]) -> String
+
+pub fn signing_key(String, String, String) -> Bytes
+
+pub fn signing_key_hex(String, String, String) -> String
+
+pub fn string_to_sign_of(String, String, String) -> String
+
+pub let unsigned_payload : String
+
+pub fn uri_encode(String, keep_slash? : Bool) -> String
+
+pub fn with_required_headers(RequestToSign, String, header_prefix? : HeaderPrefix) -> RequestToSign
+
+// Errors
+
+// Types and methods
+pub struct Credentials {
+  access_key : String
+  secret_key : String
+}
+pub fn Credentials::access_key(Self) -> String
+pub fn Credentials::new(String, String) -> Self raise @error.ObsError
+pub fn Credentials::presign_at(Self, String, String, Int64, RequestToSign) -> PresignedUrl raise @error.ObsError
+pub fn Credentials::sign(Self, String, RequestToSign, header_prefix? : HeaderPrefix) -> Signature raise @error.ObsError
+pub fn Credentials::sign_at(Self, String, Int64, RequestToSign, header_prefix? : HeaderPrefix) -> Signature raise @error.ObsError
+
+pub(all) struct HeaderBlock {
+  block : String
+  signed_names : Array[String]
+}
+
+pub(all) enum HeaderPrefix {
+  Obs
+  Amz
+}
+pub fn HeaderPrefix::acl_header(Self) -> String
+pub fn HeaderPrefix::content_sha256_header(Self) -> String
+pub fn HeaderPrefix::date_header(Self) -> String
+pub fn HeaderPrefix::security_token_header(Self) -> String
+pub fn HeaderPrefix::text(Self) -> String
+
+pub(all) struct PresignedUrl {
+  query : String
+  signature : String
+  timestamp : String
+  scope : String
+  signed_headers : String
+  canonical_request : String
+  string_to_sign : String
+}
+
+pub(all) struct RequestToSign {
+  verb : String
+  canonical_uri : String
+  query : Array[(String, String)]
+  headers : Array[(String, String)]
+  payload_hash : String
+}
+pub fn RequestToSign::new(String, String, query? : Array[(String, String)], headers? : Array[(String, String)], payload_hash? : String) -> Self
+
+pub(all) struct Signature {
+  authorization : String
+  signed_headers : String
+  scope : String
+  timestamp : String
+  canonical_request : String
+  string_to_sign : String
+  signature : String
+}
+
+// Type aliases
+
+// Traits

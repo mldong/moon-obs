@@ -1,0 +1,144 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "mldong/moon-obs/obs"
+
+import {
+  "mldong/moon-hutool/http",
+  "mldong/moon-obs/auth",
+  "mldong/moon-obs/config",
+  "mldong/moon-obs/error",
+}
+
+// Values
+pub let signed_prefix : @auth.HeaderPrefix
+
+pub fn xml_all(String, String) -> Array[String]
+
+pub fn xml_element(String, String) -> XmlElement?
+
+pub fn xml_element_names(String) -> Array[String]
+
+pub fn xml_elements(String, String) -> Array[XmlElement]
+
+pub fn xml_error_code(String) -> String
+
+pub fn xml_escape(String) -> String
+
+pub fn xml_first(String, String) -> String?
+
+pub fn xml_sections(String, String) -> Array[String]
+
+pub fn xml_unescape(String) -> String
+
+// Errors
+
+// Types and methods
+pub(all) struct BucketListing {
+  names : Array[String]
+  body : String
+}
+
+pub struct Client {
+  config : @config.Config
+  transport : &@http.Transport
+}
+pub async fn Client::abort_multipart_upload(Self, String, String, String) -> Unit raise @error.ObsError
+pub async fn Client::complete_multipart_upload(Self, String, String, String, Array[(Int32, String)]) -> String raise @error.ObsError
+pub fn Client::config_of(Self) -> @config.Config
+pub async fn Client::copy_object(Self, String, String, String, String, metadata? : Array[(String, String)]) -> CopyResult raise @error.ObsError
+pub async fn Client::create_multipart_upload(Self, String, String, content_type? : String, metadata? : Array[(String, String)]) -> String raise @error.ObsError
+pub async fn Client::delete_object(Self, String, String) -> Unit raise @error.ObsError
+pub async fn Client::get_object(Self, String, String, range? : String) -> ObjectData raise @error.ObsError
+pub async fn Client::get_object_acl(Self, String, String) -> ObjectAcl raise @error.ObsError
+pub async fn Client::list_buckets(Self) -> BucketListing raise @error.ObsError
+pub async fn Client::list_objects(Self, String, prefix? : String, delimiter? : String, max_keys? : Int32, marker? : String) -> ObjectListing raise @error.ObsError
+pub async fn Client::list_parts(Self, String, String, String, part_number_marker? : Int32) -> PartPage raise @error.ObsError
+pub fn Client::new(@config.Config, &@http.Transport) -> Self
+pub fn Client::presigned_get_url(Self, String, String, expires_sec? : Int64) -> String raise @error.ObsError
+pub fn Client::presigned_put_url(Self, String, String, expires_sec? : Int64, content_type? : String) -> String raise @error.ObsError
+pub async fn Client::put_object(Self, String, String, Bytes, content_type? : String, metadata? : Array[(String, String)], acl? : String) -> PutObjectResult raise @error.ObsError
+pub async fn Client::put_object_acl(Self, String, String, String) -> Unit raise @error.ObsError
+pub async fn Client::stat_object(Self, String, String) -> ObjectStat raise @error.ObsError
+pub async fn Client::upload_part(Self, String, String, String, Int32, Bytes) -> String raise @error.ObsError
+
+pub(all) struct CopyResult {
+  etag : String
+  body : String
+}
+
+pub(all) struct Grant {
+  grantee_type : String
+  grantee_id : String?
+  grantee_uri : String?
+  grantee_email : String?
+  permission : String
+}
+
+pub(all) struct ObjectAcl {
+  grants : Array[Grant]
+  owner_id : String?
+  default_ns : String?
+  body : String
+}
+pub fn ObjectAcl::grant_count(Self) -> Int32
+
+pub(all) struct ObjectData {
+  content_length : Int64
+  content_type : String?
+  metadata : Array[(String, String)]
+  content_range : String?
+  etag : String?
+  body : Bytes
+}
+
+pub(all) struct ObjectInfo {
+  key : String
+  etag : String?
+  size : Int64
+  last_modified : String?
+}
+
+pub(all) struct ObjectListing {
+  objects : Array[ObjectInfo]
+  common_prefixes : Array[String]
+  is_truncated : Bool
+  next_marker : String?
+  body : String
+}
+
+pub(all) struct ObjectStat {
+  key : String
+  etag : String?
+  size : Int64
+  last_modified : String?
+  content_type : String?
+  metadata : Array[(String, String)]
+}
+
+pub(all) struct PartInfo {
+  part_number : Int32
+  etag : String
+  size : Int64
+}
+
+pub(all) struct PartPage {
+  parts : Array[PartInfo]
+  is_truncated : Bool
+  next_part_number_marker : String?
+  body : String
+}
+
+pub(all) struct PutObjectResult {
+  etag : String
+}
+
+pub(all) struct XmlElement {
+  content : String
+  attrs : String
+  self_closing : Bool
+}
+pub fn XmlElement::attr(Self, String) -> String?
+pub fn XmlElement::ns_decl(Self, String) -> String?
+
+// Type aliases
+
+// Traits

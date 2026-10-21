@@ -1,0 +1,25 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "mldong/moon-obs/error"
+
+// Values
+
+// Errors
+pub(all) suberror ObsError {
+  BadParam(String)
+  Network(String)
+  BadResponse(String)
+  Service(ServiceError)
+}
+pub fn ObsError::text(Self) -> String
+
+// Types and methods
+pub(all) struct ServiceError {
+  status : Int32
+  code : String
+  message : String
+  request_id : String?
+}
+
+// Type aliases
+
+// Traits

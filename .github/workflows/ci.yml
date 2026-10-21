@@ -1,0 +1,247 @@
+name: ci
+
+# mldong/moon-obs —— 华为云 OBS 原生协议客户端的门禁与发布链。
+#
+# 形状照这条线的姊妹件（moon-cos／moon-oss）抄，三处按 OBS 的实测改：
+#   1. live 腿 10 档，门控 env 是 OBS_AK／OBS_SK／OBS_BUCKET／OBS_REGION（org 级 secret）；
+#   2. 判"重发纪律"的那三条真桶证据看的是**每一发的下场**（`answered` /
+#      `died-before-response`），不是发数常数——2026-10-21 本机实测：HEAD 的第一发会把
+#      30 秒默认超时用满，按政策重发一次后第二发才拿到 403，那种 `sends=2` 是正确行为；
+#   3. 无凭据那一跑额外拦 `X-Amz-Signature=`／`X-Amz-Credential=`：预签名与授权串里的 query
+#      就是限时授权本体，它们只该在带凭据那一档出现。
+#
+# native 档在 ubuntu runner 上跑得动（CI 里跑），本机 Windows 跑不动（native 运行时只认 MSVC）：
+# 那是工具链边界，不是回归，所以本机的读数只按 wasm 档报。
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*.*.*']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "检查全绿后是否发布 mldong/moon-obs 到 mooncakes（tag 触发默认发布；手动触发需显式勾选）"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Check / Build / Test (wasm + native, live OBS bucket)
+    runs-on: ubuntu-latest
+    env:
+      # 现读，不是推算：`moon test --target wasm -j 1 --no-render` 的汇总行 Total tests。
+      # 49 = 离线 39（签名向量、编码、重发资格表与那条判据的正反对照）＋ live 10。
+      EXPECTED_TESTS: "49"
+      EXPECTED_SKIPS: "10"
+      CI_EXPECTED_SKIPS: "0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MoonBit toolchain (latest)
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Toolchain version
+        run: |
+          moon version --all
+          moon update
+
+      - name: Preflight live-bucket credentials (values never printed)
+        env:
+          OBS_AK: ${{ secrets.OBS_AK }}
+          OBS_SK: ${{ secrets.OBS_SK }}
+          OBS_BUCKET: ${{ secrets.OBS_BUCKET }}
+          OBS_REGION: ${{ secrets.OBS_REGION }}
+        run: |
+          # 只打印长度：AK/SK 是密钥本体，桶名与区域虽可打印，也在同一段里一起按长度报，
+          # 免得有人把这一格当成"可以 echo 值"的口子。
+          missing=0
+          for pair in "OBS_AK:${#OBS_AK}" "OBS_SK:${#OBS_SK}" \
+                      "OBS_BUCKET:${#OBS_BUCKET}" "OBS_REGION:${#OBS_REGION}"; do
+            name=${pair%%:*}; len=${pair##*:}
+            if [ "$len" = "0" ]; then
+              echo "::error::$name 没到位——缺它这 10 条 live 腿只会 SKIP，那不是绿"
+              missing=1
+            else
+              echo "  $name 到位（长度 $len，值不外泄）"
+            fi
+          done
+          # 这里**不引用** secrets.OBS_DOMAIN：自定义域名那一头的 TLS 证书还没在桶侧绑
+          # （I0 实测：域名能解析但证书不匹配，预签名又绑 Host），没有任何一条用例读它。
+          # 别把这一格"补全"成第五个 secret。
+          [ "$missing" = "0" ]
+
+      - name: Check
+        run: moon check --target wasm --no-render
+
+      - name: Build
+        run: |
+          moon build --target wasm --no-render
+          moon build --target native --no-render
+
+      - name: "Test (with credentials: live legs must really run)"
+        env:
+          OBS_AK: ${{ secrets.OBS_AK }}
+          OBS_SK: ${{ secrets.OBS_SK }}
+          OBS_BUCKET: ${{ secrets.OBS_BUCKET }}
+          OBS_REGION: ${{ secrets.OBS_REGION }}
+          OBS_RUN_TAG: ${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          # 整档允许重试（最多 3 次）并且每次红都留下读数：打公网 OBS 这一头会间歇红在传输层
+          # （2026-10-21 本机实测：HEAD/GET 把 30 秒默认超时用满）。公网间歇不是代码问题，
+          # 但"用了几次才过"必须写进 summary——靠 re-run 混过去的门禁等于没有门禁。
+          # OBS_RUN_TAG 进的是 `obs/moon.pkg` 那条 env 读数：每条腿用它把自己那格前缀隔开，
+          # 重跑不与上一轮的残留互踩。
+          run_live() {
+            target=$1; out=$2; a=1
+            until moon test --target "$target" -j 1 --no-render > "$out" 2>&1; do
+              echo "::warning::$target 档第 $a 次红，贴出失败前后的尾部读数"
+              grep -E "FAILED|failed:" "$out" | head -8 || true
+              tail -40 "$out" || true
+              if [ "$a" -ge 3 ]; then
+                echo "::error::$target 档连红 3 次，这次不是抖动"
+                exit 1
+              fi
+              a=$((a + 1)); sleep 20
+            done
+            echo "$target 档通过所用尝试次数：$a / 3" >> "$GITHUB_STEP_SUMMARY"
+            grep -q "Total tests: $EXPECTED_TESTS, passed: $EXPECTED_TESTS, failed: 0" "$out"
+            skips=$(grep -c "SKIP IS NOT A PASS" "$out" || true)
+            if [ "$skips" != "$CI_EXPECTED_SKIPS" ]; then
+              echo "::error::$target 档有 $skips 条 live 腿在 CI 里 SKIP 了（应为 $CI_EXPECTED_SKIPS）——" \
+                   "secret 掉了或公网断了，这不算绿"
+              grep -n "SKIP IS NOT A PASS" "$out" | head -3
+              exit 1
+            fi
+            echo "$target 档：$EXPECTED_TESTS 条全绿已核，SKIP 行数=$skips" >> "$GITHUB_STEP_SUMMARY"
+          }
+          run_live wasm wasm-test.txt
+          run_live native native-test.txt
+          # 承重读数打出来，让人一眼看出真端点真被打到（这些行不含任何凭据）：
+          # 每一发的下场（重发纪律）、错密钥那一发的服务端码、ACL 那一发的取值面。
+          grep -E "每一发的下场=|错密钥读数=|回体里 grant 的拼法" wasm-test.txt | head -8
+
+      - name: "Test (without credentials: the 10 live legs must skip loudly)"
+        run: |
+          # 这一步核的是"响亮 SKIP"这件事本身：把四个 secret 从环境里摘掉再跑一遍，
+          # 要求条数照旧 49、SKIP 行数恰为 $EXPECTED_SKIPS（= live 腿总数）。
+          # 少一条是有人给某条腿加了"没凭据也照跑"的分支，多一条是有人新加了腿而没改 EXPECTED_SKIPS。
+          out=nocred-test.txt
+          env -u OBS_AK -u OBS_SK -u OBS_BUCKET -u OBS_REGION -u OBS_RUN_TAG \
+            moon test --target wasm -j 1 --no-render > "$out" 2>&1
+          grep -q "Total tests: $EXPECTED_TESTS, passed: $EXPECTED_TESTS, failed: 0" "$out"
+          skips=$(grep -c "SKIP IS NOT A PASS" "$out" || true)
+          if [ "$skips" != "$EXPECTED_SKIPS" ]; then
+            echo "::error::无凭据那一跑的 SKIP 行数=$skips，应为 $EXPECTED_SKIPS（live 腿总数）"
+            grep -n "SKIP IS NOT A PASS" "$out" | head -12
+            exit 1
+          fi
+          echo "无凭据档：$EXPECTED_TESTS 条、SKIP $skips 条（live 腿总数），已核" \
+            >> "$GITHUB_STEP_SUMMARY"
+          # 离线桩档里那两条日志原文是**夹具造出来的**串（`/examplebucket/...`），可以出现；
+          # 但预签名串与 Authorization 里的 Credential 是限时授权本体，无凭据这一跑里一条都不许有。
+          ! grep -qE "X-Amz-Signature=|X-Amz-Credential=" "$out"
+
+      - name: README snippet check
+        run: |
+          export MOON_HOME="$HOME/.moon"
+          bash scripts/readme-check.sh
+
+      - name: Generated interface is up to date
+        run: |
+          moon info --target wasm
+          git diff --exit-code -- '*pkg.generated.mbti'
+
+      - name: Formatting
+        run: moon fmt --check
+
+      - name: Assert zero warnings
+        run: |
+          moon check --target wasm --no-render 2>&1 | tee check.txt
+          ! grep -q "Warning" check.txt
+
+  publish:
+    name: Publish mldong/moon-obs to mooncakes
+    needs: verify
+    # 判据是单数 'tag'：写成 'tags' 会让 tag 推送的整个 publish job 被 skip，而 workflow 结论
+    # 照旧 success（moon-token 的 v0.1.7 就是这么静默漏发过一次）。下面第一步把三个值打进 log。
+    if: github.ref_type == 'tag' || (github.event_name == 'workflow_dispatch' && inputs.publish)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: What triggered this publish
+        env:
+          PUBLISH_INPUT: ${{ inputs.publish }}
+        run: |
+          echo "event_name=$GITHUB_EVENT_NAME ref=$GITHUB_REF ref_type=$GITHUB_REF_TYPE"
+          echo "publish input=$PUBLISH_INPUT version=$(sed -nE 's/^version = "([^"]+)".*/\1/p' moon.mod | head -1)"
+
+      - name: Install MoonBit toolchain (latest)
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          "$HOME/.moon/bin/moon" version
+
+      - name: Preflight credentials present (values never printed)
+        env:
+          MOON_TOKEN: ${{ secrets.MOON_TOKEN }}
+          MOON_USERNAME: ${{ secrets.MOON_USERNAME }}
+        run: |
+          [ -n "$MOON_TOKEN" ] || {
+            echo "::error::secrets.MOON_TOKEN 没到位（org 级 secret 需把本仓放进可见范围，或在本仓建同名）"
+            exit 1
+          }
+          [ -n "$MOON_USERNAME" ] || { echo "::error::secrets.MOON_USERNAME 没到位"; exit 1; }
+          echo "凭证到位：token 长度 ${#MOON_TOKEN}（值不外泄），用户名 $MOON_USERNAME"
+
+      - name: Write mooncakes credentials
+        env:
+          MOON_TOKEN: ${{ secrets.MOON_TOKEN }}
+          MOON_USERNAME: ${{ secrets.MOON_USERNAME }}
+        run: |
+          mkdir -p "$HOME/.moon"
+          printf '{"token":"%s","username":"%s"}\n' "$MOON_TOKEN" "$MOON_USERNAME" \
+            > "$HOME/.moon/credentials.json"
+
+      - name: Update registry index
+        run: |
+          # 裸 `moon install` 在 0.1.20261020 起已改成 `moon install <SOURCE> [PATH_IN_REPO]`
+          # （从 git 源装包），无参调用 exit 2，会把整条发布链拦在刷索引这一步——moon-token
+          # publish.yml 同款修复已实弹发过 0.1.53。工作区成员与依赖由各步自己解析，这里只刷索引。
+          moon update
+
+      - name: Publish (re-entrant, skip if the index already has this version)
+        run: bash .github/scripts/publish-if-absent.sh . mldong/moon-obs
+
+      # 上传 200／版本可见／用户装得到是三件事，这一步只认第三件：按新用户的路径建空工程，用
+      # `moon add` 引刚发上去的那一代，把解析到的 pin 打进 log，再真编译真跑。
+      # 探针里的表达式抄自已过门禁的 README 最小用法块，不是现编的 API；整块不打网络。
+      - name: Consumer leg — install the just-published version and build against it
+        run: |
+          export MOON_HOME="$HOME/.moon"
+          moon update
+          probe="$RUNNER_TEMP/consumer-obs"
+          rm -rf "$probe"; mkdir -p "$probe/lib"
+          printf 'name = "mldong/consumer_probe_obs"\nversion = "0.0.0"\npreferred_target = "wasm"\n' > "$probe/moon.mod"
+          printf 'import {\n  "mldong/moon-obs/obs" @sdk,\n  "mldong/moon-obs/auth" @obsauth,\n  "mldong/moon-obs/config" @obsconfig,\n} for "test"\n\nsupported_targets = "wasm+native"\n' > "$probe/lib/moon.pkg"
+          printf 'test "the just-published module installs and works" {\n  let signed = @obsauth.sign_v4("AKIDEXAMPLE", "wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY", "us-east-1", "20261016T010203Z", @obsauth.RequestToSign::new(\n    "GET",\n    "/examplebucket/plain.txt",\n    headers=[("host", "examplebucket.obs.us-east-1.myhuaweicloud.com"), ("x-amz-content-sha256", @obsauth.unsigned_payload), ("x-amz-date", "20261016T010203Z")],\n    payload_hash=@obsauth.unsigned_payload,\n  ))\n  assert_true(signed.authorization.has_prefix("AWS4-HMAC-SHA256 Credential=AKIDEXAMPLE/20261016/us-east-1/s3/aws4_request,SignedHeaders=host;x-amz-content-sha256;x-amz-date,Signature="))\n  assert_eq(@obsconfig.native_endpoint_host("cn-north-4"), "obs.cn-north-4.myhuaweicloud.com")\n  assert_eq(@sdk.xml_error_code("<Error><Code>NoSuchKey</Code><Message>gone</Message></Error>"), "NoSuchKey")\n}\n' > "$probe/lib/probe_test.mbt"
+          cd "$probe"
+          # 发布后索引与制品的传播有尾（上传 200 ≠ 装得到），故重试 3 次；用了几次才装到进 summary。
+          a=1
+          until moon add mldong/moon-obs; do
+            if [ "$a" -ge 3 ]; then
+              echo "::error::连试 3 次都从注册表装不到刚发上去的 mldong/moon-obs —— 这次是真没装得到"
+              exit 1
+            fi
+            a=$((a + 1)); moon update >/dev/null 2>&1 || true; sleep 20
+          done
+          echo "consumer leg 安装所用尝试次数：$a / 3" >> "$GITHUB_STEP_SUMMARY"
+          echo "注册表解析到的 pin：$(grep -oE 'mldong/moon-obs@[0-9.]*' moon.mod | head -1)"
+          moon test --target wasm --no-render
