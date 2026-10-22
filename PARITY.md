@@ -2,8 +2,8 @@
 
 > 协议基线：[OBS API 概览](https://support.huaweicloud.com/api-obs/obs_04_0005.html)
 > 参考实现：`huaweicloud/huaweicloud-sdk-python-obs@v3.26.6`（2026-07-10）；交叉核对 Go `v3.26.6`（2026-07-21）
-> 本仓版本：`mldong/moon-obs@0.4.0`
-> 当前公开面：62 个 `Client::` 方法（0.4.0）
+> 本仓版本：`mldong/moon-obs@0.5.0`
+> 当前公开面：67 个 `Client::` 方法（0.5.0）
 > 状态：现有行先记 `已实现`，真桶证据待按基线逐行复核
 
 ## 1. 当前公开面
@@ -53,9 +53,10 @@
 | OBS-BKT-016 | 复制（Get/Put/DeleteBucketReplication） | `get_bucket_replication` `put_bucket_replication` `delete_bucket_replication` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（未配置回 None）；写只落离线件 |
 | OBS-BKT-014 | 服务端加密（Get/Put/DeleteBucketEncryption） | `get_bucket_encryption` `put_bucket_encryption` `delete_bucket_encryption` | P1 | 已实现 | GET 2026-10-22 真桶绿；PUT/DELETE 未跑 |
 | OBS-BKT-010 | 清单（Inventory 四件） | `put_bucket_inventory` `get_bucket_inventory` `delete_bucket_inventory` `list_bucket_inventories` | P1 | 部分真桶 | 该桶 ListBucketInventory 实测 405（能力/区域限制），按读数记录；写只落离线件 |
-| OBS-BKT-018 | 对象锁（Object Lock） | — | P1 | 未开始 | 对象锁 |
+| OBS-BKT-018 | 对象锁（Get/PutBucketObjectLock） | `get_bucket_object_lock` `put_bucket_object_lock` | P1 | 部分真桶 | 读真桶 400（桶非对象锁桶），未验证；写只落离线件 |
 | OBS-BKT-017 | 桶策略（Get/Put/DeleteBucketPolicy） | `get_bucket_policy` `put_bucket_policy` `delete_bucket_policy` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（未配置回 None）；写只落离线件 |
-| OBS-BKT-011 | 配额/存储信息/自定义域（Quota/StorageInfo/CustomDomain） | — | P1 | 未开始 | 配额、存储信息、自定义域 |
+| OBS-BKT-011 | 配额/存储信息（Quota/StorageInfo） | `set_bucket_quota` `get_bucket_quota` `get_bucket_storage_info` | P1 | 部分真桶 | 真桶读数 quota=0、size=12、objects=1；写只落离线件 |
+| OBS-BKT-019 | 自定义域（CustomDomain） | — | P1 | 未开始 | 自定义域 |
 | OBS-BKT-012 | 冷直读/镜像回源/DIS/解压（DirectColdAccess/Mirror/DIS/Decompress） | — | P1 | 未开始 | OBS 特有桶能力 |
 
 ### P2 · 便利/安全层

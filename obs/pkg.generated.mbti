@@ -53,6 +53,12 @@ pub(all) struct BucketLoggingStatus {
   body : String
 }
 
+pub(all) struct BucketStorageInfo {
+  size : Int64?
+  object_number : Int64?
+  body : String
+}
+
 pub struct Client {
   config : @config.Config
   transport : &@http.Transport
@@ -83,8 +89,11 @@ pub async fn Client::get_bucket_encryption(Self, String) -> String? raise @error
 pub async fn Client::get_bucket_inventory(Self, String, String) -> InventoryConfig? raise @error.ObsError
 pub async fn Client::get_bucket_lifecycle(Self, String) -> Array[LifecycleRule] raise @error.ObsError
 pub async fn Client::get_bucket_logging(Self, String) -> BucketLoggingStatus raise @error.ObsError
+pub async fn Client::get_bucket_object_lock(Self, String) -> ObjectLockConfig? raise @error.ObsError
 pub async fn Client::get_bucket_policy(Self, String) -> String? raise @error.ObsError
+pub async fn Client::get_bucket_quota(Self, String) -> Int64? raise @error.ObsError
 pub async fn Client::get_bucket_replication(Self, String) -> ReplicationConfig? raise @error.ObsError
+pub async fn Client::get_bucket_storage_info(Self, String) -> BucketStorageInfo raise @error.ObsError
 pub async fn Client::get_bucket_tagging(Self, String) -> ObjectTagging raise @error.ObsError
 pub async fn Client::get_bucket_versioning(Self, String) -> String? raise @error.ObsError
 pub async fn Client::get_bucket_website(Self, String) -> WebsiteConfig? raise @error.ObsError
@@ -106,6 +115,7 @@ pub async fn Client::put_bucket_encryption(Self, String, algorithm? : String) ->
 pub async fn Client::put_bucket_inventory(Self, String, InventoryConfig) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_lifecycle(Self, String, Array[LifecycleRule]) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_logging(Self, String, String, target_prefix? : String) -> Unit raise @error.ObsError
+pub async fn Client::put_bucket_object_lock(Self, String, ObjectLockConfig) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_policy(Self, String, String) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_replication(Self, String, ReplicationConfig) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_tagging(Self, String, Array[ObjectTag]) -> Unit raise @error.ObsError
@@ -116,6 +126,7 @@ pub async fn Client::put_object_acl(Self, String, String, String) -> Unit raise 
 pub async fn Client::put_object_tagging(Self, String, String, Array[ObjectTag]) -> Unit raise @error.ObsError
 pub async fn Client::rename_object(Self, String, String, String) -> Unit raise @error.ObsError
 pub async fn Client::restore_object(Self, String, String, days? : Int32, tier? : String) -> Unit raise @error.ObsError
+pub async fn Client::set_bucket_quota(Self, String, Int64) -> Unit raise @error.ObsError
 pub async fn Client::stat_object(Self, String, String, if_match? : String, if_none_match? : String, if_modified_since? : String, if_unmodified_since? : String) -> ObjectStat raise @error.ObsError
 pub async fn Client::truncate_object(Self, String, String, Int64) -> Unit raise @error.ObsError
 pub async fn Client::upload_part(Self, String, String, String, Int32, Bytes, content_md5? : String, compute_md5? : Bool) -> String raise @error.ObsError
@@ -237,6 +248,14 @@ pub(all) struct ObjectListing {
   next_marker : String?
   body : String
 }
+
+pub(all) struct ObjectLockConfig {
+  enabled : String
+  mode : String
+  days : Int32?
+  years : Int32?
+}
+pub fn ObjectLockConfig::new(enabled? : String, mode? : String) -> Self
 
 pub(all) struct ObjectStat {
   key : String

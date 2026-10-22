@@ -133,6 +133,20 @@ async fn extra_stat_status(
 }
 
 ///|
+async fn extra_object_lock_text(
+  client : @obs.Client,
+  bucket : String,
+) -> String {
+  let config = client.get_bucket_object_lock(bucket) catch {
+    err => return "status:" + extra_status(err).to_string()
+  }
+  match config {
+    Some(_) => "ok:configured"
+    None => "ok:none"
+  }
+}
+
+///|
 async fn extra_inventory_text(client : @obs.Client, bucket : String) -> String {
   let items = client.list_bucket_inventories(bucket) catch {
     err => return "status:" + extra_status(err).to_string()
@@ -294,6 +308,23 @@ async test "真桶·存储类/自动 MD5/版本与 CORS 读：自命名前缀，
           err => fail("get bucket replication: " + err.text())
         }
         let inventory_state = extra_inventory_text(client, bucket)
+        let lock_state = extra_object_lock_text(client, bucket)
+        let quota = client.get_bucket_quota(bucket) catch {
+          err => fail("get bucket quota: " + err.text())
+        }
+        let storage = client.get_bucket_storage_info(bucket) catch {
+          err => fail("get bucket storage info: " + err.text())
+        }
+        println(
+          "obs object-lock=" +
+          lock_state +
+          " quota=" +
+          quota.unwrap_or(-1L).to_string() +
+          " storage_size=" +
+          storage.size.unwrap_or(-1L).to_string() +
+          " objects=" +
+          storage.object_number.unwrap_or(-1L).to_string(),
+        )
         println("obs inventory list=" + inventory_state)
         if inventory_state.has_prefix("status:403") ||
           inventory_state.has_prefix("status:405") {
