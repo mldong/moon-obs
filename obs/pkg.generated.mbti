@@ -69,6 +69,7 @@ pub async fn Client::delete_bucket(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_cors(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_encryption(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_lifecycle(Self, String) -> Unit raise @error.ObsError
+pub async fn Client::delete_bucket_policy(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_tagging(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_website(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_object(Self, String, String, if_match? : String) -> Unit raise @error.ObsError
@@ -79,6 +80,7 @@ pub async fn Client::get_bucket_cors(Self, String) -> Array[CorsRule] raise @err
 pub async fn Client::get_bucket_encryption(Self, String) -> String? raise @error.ObsError
 pub async fn Client::get_bucket_lifecycle(Self, String) -> Array[LifecycleRule] raise @error.ObsError
 pub async fn Client::get_bucket_logging(Self, String) -> BucketLoggingStatus raise @error.ObsError
+pub async fn Client::get_bucket_policy(Self, String) -> String? raise @error.ObsError
 pub async fn Client::get_bucket_tagging(Self, String) -> ObjectTagging raise @error.ObsError
 pub async fn Client::get_bucket_versioning(Self, String) -> String? raise @error.ObsError
 pub async fn Client::get_bucket_website(Self, String) -> WebsiteConfig? raise @error.ObsError
@@ -98,6 +100,7 @@ pub async fn Client::put_bucket_cors(Self, String, Array[CorsRule]) -> Unit rais
 pub async fn Client::put_bucket_encryption(Self, String, algorithm? : String) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_lifecycle(Self, String, Array[LifecycleRule]) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_logging(Self, String, String, target_prefix? : String) -> Unit raise @error.ObsError
+pub async fn Client::put_bucket_policy(Self, String, String) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_tagging(Self, String, Array[ObjectTag]) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_versioning(Self, String, String) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_website(Self, String, String, error_key? : String) -> Unit raise @error.ObsError

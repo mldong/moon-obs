@@ -178,7 +178,7 @@ test "寻址、编码与签名串全在本地算得出，抄这一块不打网�
 | 追加写／生命周期 | `append_object`、`get/put/delete_bucket_lifecycle` | 已实现（生命周期读） |
 | 归档解冻 | `restore_object` | 部分实现（仅离线件） |
 | 桶基础 | `create_bucket` `delete_bucket` `bucket_exists` | 部分实现（建/删未跑真桶） |
-| 桶配置读 | ACL／版本／CORS／标签／日志／网站／加密／生命周期 | 已实现 |
+| 桶配置读 | ACL／版本／CORS／标签／日志／网站／加密／生命周期／策略 | 已实现 |
 | 桶配置写 | 上述各族的 `put_*` / `delete_*` | 部分实现（只有离线件） |
 | 重命名／截断／改写 | `rename_object` `truncate_object` `modify_object` | 部分实现（POSIX 桶专属，普通桶 405） |
 | STS／自动分片／进度回调 | 无对应件 | 待开发 |

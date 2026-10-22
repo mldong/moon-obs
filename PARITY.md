@@ -2,8 +2,8 @@
 
 > 协议基线：[OBS API 概览](https://support.huaweicloud.com/api-obs/obs_04_0005.html)
 > 参考实现：`huaweicloud/huaweicloud-sdk-python-obs@v3.26.6`（2026-07-10）；交叉核对 Go `v3.26.6`（2026-07-21）
-> 本仓版本：`mldong/moon-obs@0.2.0`
-> 当前公开面：52 个 `Client::` 方法（0.2.0）
+> 本仓版本：`mldong/moon-obs@0.3.0`
+> 当前公开面：55 个 `Client::` 方法（0.3.0）
 > 状态：现有行先记 `已实现`，真桶证据待按基线逐行复核
 
 ## 1. 当前公开面
@@ -53,6 +53,7 @@
 | OBS-BKT-016 | 复制（Replication） | — | P1 | 未开始 | 复制 |
 | OBS-BKT-014 | 服务端加密（Get/Put/DeleteBucketEncryption） | `get_bucket_encryption` `put_bucket_encryption` `delete_bucket_encryption` | P1 | 已实现 | GET 2026-10-22 真桶绿；PUT/DELETE 未跑 |
 | OBS-BKT-010 | 清单/对象锁（Inventory/Object Lock） | — | P1 | 未开始 | 清单、对象锁 |
+| OBS-BKT-017 | 桶策略（Get/Put/DeleteBucketPolicy） | `get_bucket_policy` `put_bucket_policy` `delete_bucket_policy` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（未配置回 None）；写只落离线件 |
 | OBS-BKT-011 | 配额/存储信息/自定义域（Quota/StorageInfo/CustomDomain） | — | P1 | 未开始 | 配额、存储信息、自定义域 |
 | OBS-BKT-012 | 冷直读/镜像回源/DIS/解压（DirectColdAccess/Mirror/DIS/Decompress） | — | P1 | 未开始 | OBS 特有桶能力 |
 

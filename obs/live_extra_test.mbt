@@ -279,6 +279,12 @@ async test "真桶·存储类/自动 MD5/版本与 CORS 读：自命名前缀，
           err => fail("get bucket lifecycle: " + err.text())
         }
         println("obs lifecycle rules=" + lifecycle.length().to_string())
+        let policy = client.get_bucket_policy(bucket) catch {
+          err => fail("get bucket policy: " + err.text())
+        }
+        println(
+          "obs bucket policy configured=" + (policy is Some(_)).to_string(),
+        )
         let _ = client.get_bucket_acl(bucket) catch {
           err => fail("get bucket acl: " + err.text())
         }
