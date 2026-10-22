@@ -133,6 +133,14 @@ async fn extra_stat_status(
 }
 
 ///|
+async fn extra_inventory_text(client : @obs.Client, bucket : String) -> String {
+  let items = client.list_bucket_inventories(bucket) catch {
+    err => return "status:" + extra_status(err).to_string()
+  }
+  "ok:" + items.length().to_string()
+}
+
+///|
 async test "真桶·标签/条件读/批量删除：自命名前缀，失败也清扫" {
   match extra_env() {
     None => extra_skip()
@@ -282,6 +290,22 @@ async test "真桶·存储类/自动 MD5/版本与 CORS 读：自命名前缀，
         let policy = client.get_bucket_policy(bucket) catch {
           err => fail("get bucket policy: " + err.text())
         }
+        let replication = client.get_bucket_replication(bucket) catch {
+          err => fail("get bucket replication: " + err.text())
+        }
+        let inventory_state = extra_inventory_text(client, bucket)
+        println("obs inventory list=" + inventory_state)
+        if inventory_state.has_prefix("status:403") ||
+          inventory_state.has_prefix("status:405") {
+          // 该桶/区域不开放 ListBucketInventory（实测 405）或账号无权限（403），记读数不判红。
+          println("obs inventory list capability-limited")
+        } else if !inventory_state.has_prefix("ok:") {
+          fail("list bucket inventories: " + inventory_state)
+        }
+        println(
+          "obs bucket replication configured=" +
+          (replication is Some(_)).to_string(),
+        )
         println(
           "obs bucket policy configured=" + (policy is Some(_)).to_string(),
         )
