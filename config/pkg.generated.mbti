@@ -17,16 +17,19 @@ pub(all) struct Config {
   endpoint_host : String
   region : String
   credentials : @auth.Credentials
+  // private fields
 }
 pub fn Config::canonical_uri_of(Self, String, key? : String) -> String
 pub fn Config::credentials(Self) -> @auth.Credentials
 pub fn Config::from_region(String, @auth.Credentials) -> Self raise @error.ObsError
 pub fn Config::host_of(Self, String) -> String
+pub fn Config::is_domain_style(Self) -> Bool
 pub fn Config::new(String, String, @auth.Credentials) -> Self raise @error.ObsError
 pub fn Config::path_style_url(Self, String, key? : String) -> String raise @error.ObsError
 pub fn Config::region_of(Self) -> String
 pub fn Config::scheme_of(Self) -> String
 pub fn Config::url_of(Self, String, key? : String) -> String
+pub fn Config::with_domain(String, String, @auth.Credentials) -> Self raise @error.ObsError
 
 // Type aliases
 

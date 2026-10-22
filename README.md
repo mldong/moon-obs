@@ -10,9 +10,29 @@
 moon add mldong/moon-obs
 ```
 
-寻址只有虚主机一档（`<bucket>.obs.<region>.myhuaweicloud.com`）：path 风格在真端点回
+原生端点上的寻址只有虚主机一档（`<bucket>.obs.<region>.myhuaweicloud.com`）：同一条对象请求走
+path 风格（`https://obs.<region>.myhuaweicloud.com/<bucket>/<key>`）在真端点回
 403 `VirtualHostDomainRequired`，所以这里没有 `addressing_style` 这类开关，调用 path 风格
-当场 `BadParam`。
+当场 `BadParam`。**桶自己绑定的自定义域名是另一档**，见下面那一节。
+
+## 自定义域名（已绑定到某一个桶）那一档
+
+域名已经指向那个桶了，所以这一档的 host **逐字就是那个域名**，`Config::host_of` 不再拼桶名前缀：
+
+- 构造走 `Config::with_domain(domain, region, credentials)`，`domain` 带不带 scheme 都收
+  （`http://cdn.example.com`、`https://cdn.example.com`、`cdn.example.com` 三种写法都合法），
+  前缀缺省时按 `https` 派生；`region` 照旧必填（它进的是签名 scope，与寻址档位无关）。
+- 请求里的桶名**不参与寻址**（传真实桶名或空串都一样），URL 与预签名串的形状就是
+  `<scheme>://<域名>/<key>`。
+- **「域名不许再拼桶名」是实测结论**，不是推测：`<桶名>.<域名>` 这种主机名连 DNS 都不解析
+  （域名本身已经绑到桶），把虚主机那一套搬过来只会当场建连失败。
+- http 在真桶上是通的（put / stat / 读回 / presign / delete 全过，删后 404）；**同桶复制**在
+  这一档也量过（`copy_object` 的 `x-amz-copy-source` 仍是 `/<桶名>/<键>` 那一形，服务端认，
+  副本读回逐字节一致）；https 要先在桶侧绑定证书，
+  否则卡在 TLS 握手而不是卡在签名——那种红不是这个客户端的问题，别拿它当寻址证据。
+- 判档用 `Config::is_domain_style()`；坏输入的纪律与 `Config::new` 同一份：
+  `//` 之后 authority 为空（`http://`）、或主机后还带路径尾巴（`https://x.com/sneaky`，
+  尾巴里很可能藏着桶名）一律 `BadParam` 响亮拒，不静默剥。
 
 ## 最小用法
 

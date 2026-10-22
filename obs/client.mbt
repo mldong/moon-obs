@@ -1,7 +1,9 @@
 ///|
-/// OBS 原生协议客户端。一处形状先说清：**寻址只有虚主机一档**（`<bucket>.obs.<region>.…`），
-/// path 风格在真端点收不到应答（403 `VirtualHostDomainRequired`，本卡 §1 实测），
-/// 所以这里没有 `addressing_style` 这类开关。
+/// OBS 原生协议客户端。一处形状先说清：**原生端点上寻址只有虚主机一档**
+/// （`<bucket>.obs.<region>.…`），path 风格在真端点收不到应答（403 `VirtualHostDomainRequired`，
+/// 本卡 §1 实测），所以这里没有 `addressing_style` 这类开关。
+/// 另有一档不属于 path 风格：桶自己绑定的自定义域名，由 `@config.Config::with_domain` 构造，
+/// 那一档 host 逐字用域名、桶名不进 host 也不进签名路径（`Config::host_of` 自己分档）。
 pub struct Client {
   config : @config.Config
   transport : &@transport.Transport

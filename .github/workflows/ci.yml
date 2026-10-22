@@ -35,8 +35,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # 现读，不是推算：`moon test --target wasm -j 1 --no-render` 的汇总行 Total tests。
-      # 49 = 离线 39（签名向量、编码、重发资格表与那条判据的正反对照）＋ live 10。
-      EXPECTED_TESTS: "49"
+      # 54 = 离线 44（签名向量、编码、重发资格表与其判据的正反对照、自定义域名档 5 条）＋ live 10。
+      # 10-21 从 49 抬到 54：`Config::with_domain` 那一档补了 5 条离线形状档。
+      EXPECTED_TESTS: "54"
       EXPECTED_SKIPS: "10"
       CI_EXPECTED_SKIPS: "0"
     steps:
@@ -72,9 +73,9 @@ jobs:
               echo "  $name 到位（长度 $len，值不外泄）"
             fi
           done
-          # 这里**不引用** secrets.OBS_DOMAIN：自定义域名那一头的 TLS 证书还没在桶侧绑
-          # （I0 实测：域名能解析但证书不匹配，预签名又绑 Host），没有任何一条用例读它。
-          # 别把这一格"补全"成第五个 secret。
+          # 这里**不引用** secrets.OBS_DOMAIN：域名档本身已经可用（`Config::with_domain`，离线形状档钉着），
+          # 但真桶上那一档的 live 用例还没建——建的时候要先量的是 https（桶侧证书仍未绑，I0 实测域名
+          # 解析到华为云 IP 但证书名不匹配）。在那之前多挂一个 secret 只会造出一条没人读的空格。
           [ "$missing" = "0" ]
 
       - name: Check
