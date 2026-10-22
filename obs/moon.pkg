@@ -2,8 +2,10 @@ import {
   "mldong/moon-obs/auth",
   "mldong/moon-obs/config",
   "mldong/moon-obs/error",
+  "mldong/moon-hutool/digest",
   "mldong/moon-hutool/http" @transport,
   "mldong/moon-hutool/text",
+  "moonbitlang/core/encoding/base64",
   "moonbitlang/core/encoding/utf8",
   "moonbitlang/core/string",
 }

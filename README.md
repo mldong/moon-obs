@@ -163,3 +163,25 @@ test "寻址、编码与签名串全在本地算得出，抄这一块不打网�
 > 平台能力读数（原生面收不收 `list-type=2`、分片最小段尺寸、ACL 取值面与 grant 拼法、
 > 预签名免凭据可否取回等）都由仓内的真桶实测档裁决，判据与打印口径见 `obs/live_test.mbt`
 > 与 `obs/retry_live_test.mbt`；本文件不抄那些数字。
+
+## 开发进度
+
+状态词：**已实现**（有公开件且真桶跑过）、**部分实现**（子集真桶跑过，其余只有离线件）、
+**待开发**（公开面里零命中）、**不适用**（协议里没这一族）。
+
+| 能力 | 本 SDK 的件 | 状态 |
+|---|---|---|
+| 对象读写／删除／元数据 | `put_object` `get_object` `delete_object` `stat_object` | 已实现 |
+| 列举／分片五步／预签名／对象 ACL | `list_objects`、分片五件、`presigned_*`、`put/get_object_acl` | 已实现 |
+| 批量删除／对象标签／条件请求 | `delete_objects`、标签三件、`if_match~` 等 | 已实现 |
+| 存储类／自动 MD5 | `storage_class~`、`compute_md5~` | 已实现 |
+| 追加写／生命周期 | `append_object`、`get/put/delete_bucket_lifecycle` | 已实现（生命周期读） |
+| 归档解冻 | `restore_object` | 部分实现（仅离线件） |
+| 桶基础 | `create_bucket` `delete_bucket` `bucket_exists` | 部分实现（建/删未跑真桶） |
+| 桶配置读 | ACL／版本／CORS／标签／日志／网站／加密／生命周期 | 已实现 |
+| 桶配置写 | 上述各族的 `put_*` / `delete_*` | 部分实现（只有离线件） |
+| 重命名／截断／改写 | `rename_object` `truncate_object` `modify_object` | 部分实现（POSIX 桶专属，普通桶 405） |
+| STS／自动分片／进度回调 | 无对应件 | 待开发 |
+
+完整对标台账：[PARITY.md](PARITY.md)。
+

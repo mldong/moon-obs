@@ -13,6 +13,7 @@ pub async fn Client::create_multipart_upload(
   key : String,
   content_type~ : String = "",
   metadata~ : Array[(String, String)] = [],
+  storage_class~ : String = "",
 ) -> String raise @error.ObsError {
   let response = request(
     self,
@@ -22,7 +23,7 @@ pub async fn Client::create_multipart_upload(
     // `uploads` 是无值参数——OBS 的规范化查询串把它写成 `uploads=`（带等号）。
     // 这一族与 OSS 反着来（OSS 是无值只写键名），照抄那边当场签名不符。
     query=[("uploads", "")],
-    extra_headers=object_headers(content_type~, metadata~),
+    extra_headers=object_headers(content_type~, metadata~, storage_class~),
   )
   let body = response_body_text(response.body, response.status)
   match xml_first(body, "UploadId") {
@@ -49,6 +50,8 @@ pub async fn Client::upload_part(
   upload_id : String,
   part_number : Int32,
   data : Bytes,
+  content_md5~ : String = "",
+  compute_md5~ : Bool = false,
 ) -> String raise @error.ObsError {
   if part_number < 1 || part_number > 10000 {
     raise @error.BadParam(
@@ -58,12 +61,21 @@ pub async fn Client::upload_part(
   if upload_id.is_empty() {
     raise @error.BadParam("upload id is required")
   }
+  if compute_md5 && !content_md5.is_empty() {
+    raise @error.BadParam("content_md5 and compute_md5 are mutually exclusive")
+  }
+  let md5 = if compute_md5 { content_md5_of(data) } else { content_md5 }
+  let headers : Array[(String, String)] = []
+  if !md5.is_empty() {
+    headers.push(("content-md5", md5))
+  }
   let response = request(
     self,
     "PUT",
     bucket,
     key~,
     query=[("partNumber", part_number.to_string()), ("uploadId", upload_id)],
+    extra_headers=headers,
     body=@transport.RequestBody::Bytes(data),
   )
   discard_body(response)

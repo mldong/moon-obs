@@ -38,6 +38,36 @@ pub async fn Client::get_object_acl(
 ) -> ObjectAcl raise @error.ObsError {
   let response = request(self, "GET", bucket, key~, query=[("acl", "")])
   let body = response_body_text(response.body, response.status)
+  parse_acl(body)
+}
+
+///|
+pub async fn Client::put_bucket_acl(
+  self : Client,
+  bucket : String,
+  acl : String,
+) -> Unit raise @error.ObsError {
+  if acl.is_empty() {
+    raise @error.BadParam("acl value is required")
+  }
+  let response = request(self, "PUT", bucket, query=[("acl", "")], extra_headers=[
+    (acl_header_name(), acl),
+  ])
+  discard_body(response)
+}
+
+///|
+pub async fn Client::get_bucket_acl(
+  self : Client,
+  bucket : String,
+) -> ObjectAcl raise @error.ObsError {
+  let response = request(self, "GET", bucket, query=[("acl", "")])
+  let body = response_body_text(response.body, response.status)
+  parse_acl(body)
+}
+
+///|
+fn parse_acl(body : String) -> ObjectAcl {
   let policy = xml_element(body, "AccessControlPolicy")
   let default_ns = match policy {
     None => None
