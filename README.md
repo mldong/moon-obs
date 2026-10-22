@@ -15,6 +15,20 @@ path 风格（`https://obs.<region>.myhuaweicloud.com/<bucket>/<key>`）在真�
 403 `VirtualHostDomainRequired`，所以这里没有 `addressing_style` 这类开关，调用 path 风格
 当场 `BadParam`。**桶自己绑定的自定义域名是另一档**，见下面那一节。
 
+## scheme 有两种写法
+
+三档构造器（`Config::new`／`Config::from_region`／`Config::with_domain`）都收显式的 `scheme~`，
+前两份还能把 scheme 藏在串的前缀里（`http://…`／`https://…`）——`from_region` 只给区域，
+基址由本地拼出、天生没有前缀，所以那一档只有显式入口这一个。
+**两种写法都合法，但二者只能表达一个意思**——串是 `https://x` 而 `scheme~="http"` 当场
+`BadParam`（文案把两处各是什么与那个主机一起报出来），既不静默覆盖也不静默忽略；
+两处都不给时是 `https`。`scheme~` 的默认值是**空串**（＝"调用方没显式指定"），不是 `"https"`：
+填 https 会把 `Config::new("http://obs.x.com", …)` 这种自带前缀的合法输入误伤成冲突。
+
+区域端点上 `scheme~="http"` 这一格是给**代理／内网镜像／抓包**用的，接真桶没理由用它；
+自定义域名那一档不同——真桶实测绑桶域名 80 端口由 `Server: OBS` 亲口应答，443 因桶侧没绑
+证书停在 TLS，所以那一档的 http 是真通的。
+
 ## 自定义域名（已绑定到某一个桶）那一档
 
 域名已经指向那个桶了，所以这一档的 host **逐字就是那个域名**，`Config::host_of` 不再拼桶名前缀：
@@ -22,6 +36,8 @@ path 风格（`https://obs.<region>.myhuaweicloud.com/<bucket>/<key>`）在真�
 - 构造走 `Config::with_domain(domain, region, credentials)`，`domain` 带不带 scheme 都收
   （`http://cdn.example.com`、`https://cdn.example.com`、`cdn.example.com` 三种写法都合法），
   前缀缺省时按 `https` 派生；`region` 照旧必填（它进的是签名 scope，与寻址档位无关）。
+  想不靠前缀就显式给 `scheme~`（`Config::with_domain("cdn.example.com", region, creds, scheme="http")`），
+  但这一档同样遵守"前缀与 `scheme~` 只能表达一个意思"那条（见上一节）。
 - 请求里的桶名**不参与寻址**（传真实桶名或空串都一样），URL 与预签名串的形状就是
   `<scheme>://<域名>/<key>`。
 - **「域名不许再拼桶名」是实测结论**，不是推测：`<桶名>.<域名>` 这种主机名连 DNS 都不解析
