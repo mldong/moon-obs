@@ -59,7 +59,7 @@ pub fn native_endpoint_host(region : String) -> String {
 /// - `scheme~` 空串（默认）⇒ https；给了就照它来。这一档**不存在冲突**：
 ///   自己拼出来的基址天生没有前缀，所以显式值没有对手（前缀那一格是空的），
 ///   校验仍与 [Config::new] 同一条（只收 `http`／`https`，别的一律 `BadParam`）。
-/// - 想固定用 https 就别给这一格：`scheme~="https"` 与不给在这一档读数相同。
+/// - 想固定用 https 就别给这一格：`scheme="https"` 与不给在这一档读数相同。
 pub fn Config::from_region(
   region : String,
   credentials : @auth.Credentials,
@@ -177,7 +177,7 @@ fn split_origin(
 ///   默认值是空串，含义是"调用方没显式指定"——**不是** `"https"`：填 https 会把
 ///   `Config::new("http://obs.x.com", …)` 这种自带前缀的合法输入误伤成冲突；
 /// - 给了非 `http`／`https` 的值（`ftp`、带空格、大小写不对的 `HTTPS`）也 `BadParam`；
-/// - `scheme~="http"` 打在区域端点上是给**代理／内网镜像／抓包**用的，真桶默认仍该 https。
+/// - `scheme="http"` 打在区域端点上是给**代理／内网镜像／抓包**用的，真桶默认仍该 https。
 pub fn Config::new(
   endpoint : String,
   region : String,
