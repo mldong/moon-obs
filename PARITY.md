@@ -58,7 +58,7 @@
 | OBS-BKT-011 | 配额/存储信息（Quota/StorageInfo） | `set_bucket_quota` `get_bucket_quota` `get_bucket_storage_info` | P1 | 部分真桶 | 真桶读数 quota=0、size=12、objects=1；写只落离线件 |
 | OBS-BKT-019 | 自定义域（CustomDomain 三件） | `get_bucket_custom_domains` `set_bucket_custom_domain` `delete_bucket_custom_domain` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（1 个域名）；写只落离线件 |
 | OBS-BKT-012 | 归档直读（DirectColdAccess 三件） | `get_bucket_direct_cold_access` `put_bucket_direct_cold_access` `delete_bucket_direct_cold_access` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（已配置）；写只落离线件 |
-| OBS-BKT-020 | 镜像回源/DIS/解压（Mirror/DIS/Decompress） | — | P1 | 未开始 | OBS 特有桶能力 |
+| OBS-BKT-020 | 镜像回源/DIS/解压（Mirror/DIS/Decompress） | — | P1 | 不纳入核心 | 按 P3 边界（OBS 特有增值能力）不进核心口径 |
 
 ### P2 · 便利/安全层
 
