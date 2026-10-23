@@ -2,8 +2,8 @@
 
 > 协议基线：[OBS API 概览](https://support.huaweicloud.com/api-obs/obs_04_0005.html)
 > 参考实现：`huaweicloud/huaweicloud-sdk-python-obs@v3.26.6`（2026-07-10）；交叉核对 Go `v3.26.6`（2026-07-21）
-> 本仓版本：`mldong/moon-obs@0.11.0`
-> 当前公开面：73 个 `Client::` 方法（0.11.0）
+> 本仓版本：`mldong/moon-obs@0.13.0`
+> 当前公开面：77 个 `Client::` 方法（0.13.0）
 > 状态：现有行先记 `已实现`，真桶证据待按基线逐行复核
 
 ## 1. 当前公开面
@@ -56,7 +56,7 @@
 | OBS-BKT-018 | 对象锁（Get/PutBucketObjectLock） | `get_bucket_object_lock` `put_bucket_object_lock` | P1 | 部分真桶 | 读真桶 400（桶非对象锁桶），未验证；写只落离线件 |
 | OBS-BKT-017 | 桶策略（Get/Put/DeleteBucketPolicy） | `get_bucket_policy` `put_bucket_policy` `delete_bucket_policy` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（未配置回 None）；写只落离线件 |
 | OBS-BKT-011 | 配额/存储信息（Quota/StorageInfo） | `set_bucket_quota` `get_bucket_quota` `get_bucket_storage_info` | P1 | 部分真桶 | 真桶读数 quota=0、size=12、objects=1；写只落离线件 |
-| OBS-BKT-019 | 自定义域（CustomDomain） | — | P1 | 未开始 | 自定义域 |
+| OBS-BKT-019 | 自定义域（CustomDomain 三件） | `get_bucket_custom_domains` `set_bucket_custom_domain` `delete_bucket_custom_domain` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（1 个域名）；写只落离线件 |
 | OBS-BKT-012 | 归档直读（DirectColdAccess 三件） | `get_bucket_direct_cold_access` `put_bucket_direct_cold_access` `delete_bucket_direct_cold_access` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（已配置）；写只落离线件 |
 | OBS-BKT-020 | 镜像回源/DIS/解压（Mirror/DIS/Decompress） | — | P1 | 未开始 | OBS 特有桶能力 |
 
@@ -66,7 +66,7 @@
 |---|---|---|---|
 | OBS-SEC-001 | 临时凭据 / security token | 部分实现 | `Credentials::with_security_token` 已接 `x-amz-security-token`；**预签名 URL 暂不支持**（显式拒）；缺 STS 凭据未真桶 |
 | OBS-CNV-001 | 一条式自动分片 | `put_bytes_auto` | 部分真桶 | 2026-10-22 真桶绿（阈值触发分片并回收原对象）；断点续传/进度回调未做 |
-| OBS-CNV-002 | TransferManager / 分页器 / 重试策略 | 未开始 | 已有操作级重发，缺高层封装 |
+| OBS-CNV-002 | TransferManager / 分页器 / 重试策略 | 部分实现 | `list_all_objects` 翻页器已落并真桶绿；进度回调/断点续传未做，重试是操作级重发 |
 
 ### P3 · 可选模块
 

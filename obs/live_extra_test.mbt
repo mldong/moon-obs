@@ -321,6 +321,10 @@ async test "真桶·存储类/自动 MD5/版本与 CORS 读：自命名前缀，
         let notification = client.get_bucket_notification(bucket) catch {
           err => fail("get bucket notification: " + err.text())
         }
+        let custom_domains = client.get_bucket_custom_domains(bucket) catch {
+          err => fail("get custom domains: " + err.text())
+        }
+        println("obs custom domains=" + custom_domains.length().to_string())
         println(
           "obs notification topics=" + notification.topics.length().to_string(),
         )
@@ -560,6 +564,40 @@ async test "真桶·一条式上传：超过阈值自动分片并合完" {
       if outcome != "no-error" {
         fail(outcome)
       }
+    }
+  }
+}
+
+///|
+async test "真桶·翻页器：按前缀把所有对象翻完" {
+  match extra_env() {
+    None => extra_skip()
+    Some(env) => {
+      let client = extra_build(env) catch {
+        err => fail("setup: " + err.text())
+      }
+      let bucket = env.3
+      let root = extra_tag() + "-pager/"
+      let keys = [root + "a.txt", root + "b.txt", root + "c.txt"]
+      for key in keys {
+        let _ = client.put_object(bucket, key, extra_bytes("pager")) catch {
+          err => fail("put: " + err.text())
+        }
+      }
+      let listing = client.list_all_objects(bucket, prefix=root, max_keys=1) catch {
+        err => fail("list all: " + err.text())
+      }
+      let mut seen = 0
+      for item in listing.objects {
+        if item.key.has_prefix(root) {
+          seen = seen + 1
+        }
+      }
+      println("pager seen=" + seen.to_string())
+      if seen != keys.length() {
+        fail("pager missed objects: " + seen.to_string())
+      }
+      extra_cleanup(client, bucket, keys)
     }
   }
 }

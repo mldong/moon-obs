@@ -73,6 +73,7 @@ pub async fn Client::create_bucket(Self, String, acl? : String, storage_class? :
 pub async fn Client::create_multipart_upload(Self, String, String, content_type? : String, metadata? : Array[(String, String)], storage_class? : String) -> String raise @error.ObsError
 pub async fn Client::delete_bucket(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_cors(Self, String) -> Unit raise @error.ObsError
+pub async fn Client::delete_bucket_custom_domain(Self, String, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_direct_cold_access(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_encryption(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_inventory(Self, String, String) -> Unit raise @error.ObsError
@@ -86,6 +87,7 @@ pub async fn Client::delete_object_tagging(Self, String, String) -> Unit raise @
 pub async fn Client::delete_objects(Self, String, Array[String], quiet? : Bool) -> DeleteObjectsResult raise @error.ObsError
 pub async fn Client::get_bucket_acl(Self, String) -> ObjectAcl raise @error.ObsError
 pub async fn Client::get_bucket_cors(Self, String) -> Array[CorsRule] raise @error.ObsError
+pub async fn Client::get_bucket_custom_domains(Self, String) -> Array[CustomDomainInfo] raise @error.ObsError
 pub async fn Client::get_bucket_direct_cold_access(Self, String) -> DirectColdAccessConfig? raise @error.ObsError
 pub async fn Client::get_bucket_encryption(Self, String) -> String? raise @error.ObsError
 pub async fn Client::get_bucket_inventory(Self, String, String) -> InventoryConfig? raise @error.ObsError
@@ -103,6 +105,7 @@ pub async fn Client::get_bucket_website(Self, String) -> WebsiteConfig? raise @e
 pub async fn Client::get_object(Self, String, String, range? : String, if_match? : String, if_none_match? : String, if_modified_since? : String, if_unmodified_since? : String) -> ObjectData raise @error.ObsError
 pub async fn Client::get_object_acl(Self, String, String) -> ObjectAcl raise @error.ObsError
 pub async fn Client::get_object_tagging(Self, String, String) -> ObjectTagging raise @error.ObsError
+pub async fn Client::list_all_objects(Self, String, prefix? : String, delimiter? : String, max_keys? : Int32, max_pages? : Int32) -> ObjectListing raise @error.ObsError
 pub async fn Client::list_bucket_inventories(Self, String) -> Array[InventoryConfig] raise @error.ObsError
 pub async fn Client::list_buckets(Self) -> BucketListing raise @error.ObsError
 pub async fn Client::list_multipart_uploads(Self, String, prefix? : String, delimiter? : String, max_uploads? : Int32, key_marker? : String, upload_id_marker? : String) -> MultipartUploadListing raise @error.ObsError
@@ -132,6 +135,7 @@ pub async fn Client::put_object_acl(Self, String, String, String) -> Unit raise 
 pub async fn Client::put_object_tagging(Self, String, String, Array[ObjectTag]) -> Unit raise @error.ObsError
 pub async fn Client::rename_object(Self, String, String, String) -> Unit raise @error.ObsError
 pub async fn Client::restore_object(Self, String, String, days? : Int32, tier? : String) -> Unit raise @error.ObsError
+pub async fn Client::set_bucket_custom_domain(Self, String, String, cert? : CustomDomainCert?) -> Unit raise @error.ObsError
 pub async fn Client::set_bucket_quota(Self, String, Int64) -> Unit raise @error.ObsError
 pub async fn Client::stat_object(Self, String, String, if_match? : String, if_none_match? : String, if_modified_since? : String, if_unmodified_since? : String) -> ObjectStat raise @error.ObsError
 pub async fn Client::truncate_object(Self, String, String, Int64) -> Unit raise @error.ObsError
@@ -149,6 +153,22 @@ pub(all) struct CorsRule {
   allowed_headers : Array[String]
   expose_headers : Array[String]
   max_age_seconds : Int32?
+}
+
+pub(all) struct CustomDomainCert {
+  name : String
+  certificate : String
+  private_key : String
+  certificate_id : String
+}
+
+pub(all) struct CustomDomainInfo {
+  domain_name : String
+  certificate_id : String
+  name : String
+  certificate_type : String
+  create_time : String
+  expired_time : String
 }
 
 pub(all) struct DeleteObjectFailure {

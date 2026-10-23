@@ -41,7 +41,7 @@ jobs:
       # 10-21 从 49 抬到 54：`Config::with_domain` 那一档补了 5 条离线形状档。
       # 10-22 从 54 抬到 60：scheme 抬成显式 `scheme~`，补 6 条离线档（三档构造器各过一遍）。
       # 10-22 夜从 60 抬到 93：本轮新增离线件与三条 live 腿。
-      EXPECTED_TESTS: "111"
+      EXPECTED_TESTS: "114"
       EXPECTED_SKIPS: "14"
       CI_EXPECTED_SKIPS: "0"
     steps:
