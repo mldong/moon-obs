@@ -2,8 +2,8 @@
 
 > 协议基线：[OBS API 概览](https://support.huaweicloud.com/api-obs/obs_04_0005.html)
 > 参考实现：`huaweicloud/huaweicloud-sdk-python-obs@v3.26.6`（2026-07-10）；交叉核对 Go `v3.26.6`（2026-07-21）
-> 本仓版本：`mldong/moon-obs@0.6.0`
-> 当前公开面：67 个 `Client::` 方法（0.6.0）
+> 本仓版本：`mldong/moon-obs@0.7.0`
+> 当前公开面：67 个 `Client::` 方法（0.7.0）
 > 状态：现有行先记 `已实现`，真桶证据待按基线逐行复核
 
 ## 1. 当前公开面
