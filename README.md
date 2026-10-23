@@ -181,7 +181,8 @@ test "寻址、编码与签名串全在本地算得出，抄这一块不打网�
 | 桶配置读 | ACL／版本／CORS／标签／日志／网站／加密／生命周期／策略／复制／配额／存储用量／归档直读／事件通知 | 已实现 |
 | 桶配置写 | 上述各族的 `put_*` / `delete_*` | 部分实现（只有离线件） |
 | 重命名／截断／改写 | `rename_object` `truncate_object` `modify_object` | 部分实现（POSIX 桶专属，普通桶 405） |
-| STS／自动分片／进度回调 | 无对应件 | 待开发 |
+| STS 临时凭据 | `Credentials::with_security_token`（请求头；预签名暂不支持） | 部分实现 |
+| 断点续传／进度回调 | 无对应件（自动分片已由 `put_bytes_auto` 覆盖） | 待开发 |
 
 完整对标台账：[PARITY.md](PARITY.md)。
 

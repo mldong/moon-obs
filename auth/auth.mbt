@@ -5,6 +5,7 @@
 pub struct Credentials {
   access_key : String
   secret_key : String
+  security_token : String?
 }
 
 ///|
@@ -19,13 +20,35 @@ pub fn Credentials::new(
   if secret_key.is_empty() {
     raise @error.BadParam("secret key is empty")
   }
-  Credentials::{ access_key, secret_key, }
+  Credentials::{ access_key, secret_key, security_token: None, }
 }
 
 ///|
 /// 公开的那半把键（错误文案与记账要带它，签名本身不外露密钥）。
 pub fn Credentials::access_key(self : Credentials) -> String {
   self.access_key
+}
+
+///|
+/// 挂一把 STS 临时令牌；空串视作"不挂"，返回自身。
+pub fn Credentials::with_security_token(
+  self : Credentials,
+  token : String,
+) -> Credentials {
+  if token.is_empty() {
+    self
+  } else {
+    Credentials::{
+      access_key: self.access_key,
+      secret_key: self.secret_key,
+      security_token: Some(token),
+    }
+  }
+}
+
+///|
+pub fn Credentials::security_token(self : Credentials) -> String? {
+  self.security_token
 }
 
 ///|
