@@ -2,8 +2,8 @@
 
 > 协议基线：[OBS API 概览](https://support.huaweicloud.com/api-obs/obs_04_0005.html)
 > 参考实现：`huaweicloud/huaweicloud-sdk-python-obs@v3.26.6`（2026-07-10）；交叉核对 Go `v3.26.6`（2026-07-21）
-> 本仓版本：`mldong/moon-obs@0.7.0`
-> 当前公开面：67 个 `Client::` 方法（0.7.0）
+> 本仓版本：`mldong/moon-obs@0.8.0`
+> 当前公开面：70 个 `Client::` 方法（0.8.0）
 > 状态：现有行先记 `已实现`，真桶证据待按基线逐行复核
 
 ## 1. 当前公开面
@@ -57,7 +57,8 @@
 | OBS-BKT-017 | 桶策略（Get/Put/DeleteBucketPolicy） | `get_bucket_policy` `put_bucket_policy` `delete_bucket_policy` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（未配置回 None）；写只落离线件 |
 | OBS-BKT-011 | 配额/存储信息（Quota/StorageInfo） | `set_bucket_quota` `get_bucket_quota` `get_bucket_storage_info` | P1 | 部分真桶 | 真桶读数 quota=0、size=12、objects=1；写只落离线件 |
 | OBS-BKT-019 | 自定义域（CustomDomain） | — | P1 | 未开始 | 自定义域 |
-| OBS-BKT-012 | 冷直读/镜像回源/DIS/解压（DirectColdAccess/Mirror/DIS/Decompress） | — | P1 | 未开始 | OBS 特有桶能力 |
+| OBS-BKT-012 | 归档直读（DirectColdAccess 三件） | `get_bucket_direct_cold_access` `put_bucket_direct_cold_access` `delete_bucket_direct_cold_access` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（已配置）；写只落离线件 |
+| OBS-BKT-020 | 镜像回源/DIS/解压（Mirror/DIS/Decompress） | — | P1 | 未开始 | OBS 特有桶能力 |
 
 ### P2 · 便利/安全层
 

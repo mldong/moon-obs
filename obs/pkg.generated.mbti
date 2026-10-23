@@ -73,6 +73,7 @@ pub async fn Client::create_bucket(Self, String, acl? : String, storage_class? :
 pub async fn Client::create_multipart_upload(Self, String, String, content_type? : String, metadata? : Array[(String, String)], storage_class? : String) -> String raise @error.ObsError
 pub async fn Client::delete_bucket(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_cors(Self, String) -> Unit raise @error.ObsError
+pub async fn Client::delete_bucket_direct_cold_access(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_encryption(Self, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_inventory(Self, String, String) -> Unit raise @error.ObsError
 pub async fn Client::delete_bucket_lifecycle(Self, String) -> Unit raise @error.ObsError
@@ -85,6 +86,7 @@ pub async fn Client::delete_object_tagging(Self, String, String) -> Unit raise @
 pub async fn Client::delete_objects(Self, String, Array[String], quiet? : Bool) -> DeleteObjectsResult raise @error.ObsError
 pub async fn Client::get_bucket_acl(Self, String) -> ObjectAcl raise @error.ObsError
 pub async fn Client::get_bucket_cors(Self, String) -> Array[CorsRule] raise @error.ObsError
+pub async fn Client::get_bucket_direct_cold_access(Self, String) -> DirectColdAccessConfig? raise @error.ObsError
 pub async fn Client::get_bucket_encryption(Self, String) -> String? raise @error.ObsError
 pub async fn Client::get_bucket_inventory(Self, String, String) -> InventoryConfig? raise @error.ObsError
 pub async fn Client::get_bucket_lifecycle(Self, String) -> Array[LifecycleRule] raise @error.ObsError
@@ -111,6 +113,7 @@ pub fn Client::presigned_get_url(Self, String, String, expires_sec? : Int64) -> 
 pub fn Client::presigned_put_url(Self, String, String, expires_sec? : Int64, content_type? : String) -> String raise @error.ObsError
 pub async fn Client::put_bucket_acl(Self, String, String) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_cors(Self, String, Array[CorsRule]) -> Unit raise @error.ObsError
+pub async fn Client::put_bucket_direct_cold_access(Self, String, String) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_encryption(Self, String, algorithm? : String) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_inventory(Self, String, InventoryConfig) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_lifecycle(Self, String, Array[LifecycleRule]) -> Unit raise @error.ObsError
@@ -155,6 +158,10 @@ pub(all) struct DeleteObjectsResult {
   deleted : Array[String]
   errors : Array[DeleteObjectFailure]
   body : String
+}
+
+pub(all) struct DirectColdAccessConfig {
+  status : String
 }
 
 pub(all) struct Grant {

@@ -315,6 +315,12 @@ async test "真桶·存储类/自动 MD5/版本与 CORS 读：自命名前缀，
         let storage = client.get_bucket_storage_info(bucket) catch {
           err => fail("get bucket storage info: " + err.text())
         }
+        let cold = client.get_bucket_direct_cold_access(bucket) catch {
+          err => fail("get direct cold access: " + err.text())
+        }
+        println(
+          "obs direct cold access configured=" + (cold is Some(_)).to_string(),
+        )
         println(
           "obs object-lock=" +
           lock_state +
