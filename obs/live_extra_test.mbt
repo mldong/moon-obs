@@ -529,6 +529,7 @@ async test "真桶·一条式上传：超过阈值自动分片并合完" {
       }
       let bucket = env.3
       let key = extra_tag() + "-auto.bin"
+      let seen : Array[Int32] = []
       let payload = auto_filler(256000)
       let outcome = try {
         let put = client.put_bytes_auto(
@@ -538,6 +539,7 @@ async test "真桶·一条式上传：超过阈值自动分片并合完" {
           part_size=102400,
           threshold=102400,
           content_type="application/octet-stream",
+          progress=Some(fn(sent, _total) { seen.push(sent) }),
         ) catch {
           err => fail("put_bytes_auto: " + err.text())
         }
@@ -558,6 +560,12 @@ async test "真桶·一条式上传：超过阈值自动分片并合完" {
         "no-error"
       } catch {
         err => "measure: " + err.to_string()
+      }
+      if seen.length() < 2 {
+        fail(
+          "progress callback fired fewer than twice: " +
+          seen.length().to_string(),
+        )
       }
       extra_cleanup(client, bucket, [key])
       println("moon-obs auto upload outcome=" + outcome)

@@ -2,7 +2,7 @@
 
 > 协议基线：[OBS API 概览](https://support.huaweicloud.com/api-obs/obs_04_0005.html)
 > 参考实现：`huaweicloud/huaweicloud-sdk-python-obs@v3.26.6`（2026-07-10）；交叉核对 Go `v3.26.6`（2026-07-21）
-> 本仓版本：`mldong/moon-obs@0.14.0`
+> 本仓版本：`mldong/moon-obs@0.15.0`
 > 当前公开面：77 个 `Client::` 方法（0.14.0）
 > 状态：现有行先记 `已实现`，真桶证据待按基线逐行复核
 
@@ -65,7 +65,7 @@
 | ID | 能力 | 状态 | 备注 |
 |---|---|---|---|
 | OBS-SEC-001 | 临时凭据 / security token | 部分实现 | `Credentials::with_security_token` 已接 `x-amz-security-token`；**预签名 URL 暂不支持**（显式拒）；缺 STS 凭据未真桶 |
-| OBS-CNV-001 | 一条式自动分片 | `put_bytes_auto` | 部分真桶 | 2026-10-22 真桶绿（阈值触发分片并回收原对象）；断点续传/进度回调未做 |
+| OBS-CNV-001 | 一条式自动分片 + 进度回调 | `put_bytes_auto`（`progress~` 按片回调） | 部分真桶 | 真桶绿（分片与回调触发均验证）；断点续传未做 |
 | OBS-CNV-002 | TransferManager / 分页器 / 重试策略 | 部分实现 | `list_all_objects` 翻页器已落并真桶绿；进度回调/断点续传未做，重试是操作级重发 |
 
 ### P3 · 可选模块
