@@ -182,7 +182,7 @@ test "寻址、编码与签名串全在本地算得出，抄这一块不打网�
 | 桶配置写 | 上述各族的 `put_*` / `delete_*` | 部分实现（只有离线件） |
 | 重命名／截断／改写 | `rename_object` `truncate_object` `modify_object` | 部分实现（POSIX 桶专属，普通桶 405） |
 | STS 临时凭据 | `Credentials::with_security_token`（请求头与预签名查询串） | 部分实现 |
-| 断点续传／进度回调 | 无对应件（自动分片已由 `put_bytes_auto` 覆盖） | 待开发 |
+| 断点续传／进度回调 | `put_bytes_auto`（进度）/ `put_bytes_resumable`（续传） | 已实现 |
 
 完整对标台账：[PARITY.md](PARITY.md)。
 
