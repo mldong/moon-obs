@@ -318,6 +318,12 @@ async test "真桶·存储类/自动 MD5/版本与 CORS 读：自命名前缀，
         let cold = client.get_bucket_direct_cold_access(bucket) catch {
           err => fail("get direct cold access: " + err.text())
         }
+        let notification = client.get_bucket_notification(bucket) catch {
+          err => fail("get bucket notification: " + err.text())
+        }
+        println(
+          "obs notification topics=" + notification.topics.length().to_string(),
+        )
         println(
           "obs direct cold access configured=" + (cold is Some(_)).to_string(),
         )

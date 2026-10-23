@@ -2,8 +2,8 @@
 
 > 协议基线：[OBS API 概览](https://support.huaweicloud.com/api-obs/obs_04_0005.html)
 > 参考实现：`huaweicloud/huaweicloud-sdk-python-obs@v3.26.6`（2026-07-10）；交叉核对 Go `v3.26.6`（2026-07-21）
-> 本仓版本：`mldong/moon-obs@0.8.0`
-> 当前公开面：70 个 `Client::` 方法（0.8.0）
+> 本仓版本：`mldong/moon-obs@0.9.0`
+> 当前公开面：72 个 `Client::` 方法（0.9.0）
 > 状态：现有行先记 `已实现`，真桶证据待按基线逐行复核
 
 ## 1. 当前公开面
@@ -44,7 +44,7 @@
 | OBS-OBJ-010 | 截断（TruncateObject） | `truncate_object` | P1 | 部分真桶 | POSIX 桶专属：普通桶实测 405，未验证 |
 | OBS-OBJ-011 | 重命名（RenameObject） | `rename_object` | P1 | 部分真桶 | POSIX 桶专属：普通桶实测 405，未验证 |
 | OBS-OBJ-012 | 修改（UploadModifyObject） | `modify_object` | P1 | 部分真桶 | POSIX 桶专属：普通桶实测 405，未验证 |
-| OBS-OBJ-014 | 通知/回调（Notification/Callback） | — | P1 | 未开始 | 事件通知与回调 |
+| OBS-OBJ-014 | 事件通知（Get/PutBucketNotification，Topic 一路） | `get_bucket_notification` `put_bucket_notification` | P1 | 部分真桶 | 读 2026-10-22 真桶绿（0 条）；写只落离线件；FunctionGraph 未做 |
 | OBS-BKT-006 | 桶标签（Get/Put/DeleteBucketTagging） | `get_bucket_tagging` `put_bucket_tagging` `delete_bucket_tagging` | P1 | 已实现 | GET 2026-10-22 真桶绿；PUT/DELETE 未跑 |
 | OBS-BKT-007 | 桶日志（Get/PutBucketLogging） | `get_bucket_logging` `put_bucket_logging` | P1 | 已实现 | GET 2026-10-22 真桶绿；PUT 未跑 |
 | OBS-BKT-008 | 防盗链（Referer） | — | P1 | 不纳入 | 官方 Python 基线 `obs/client.py` 无 referer 方法 |

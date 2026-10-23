@@ -91,6 +91,7 @@ pub async fn Client::get_bucket_encryption(Self, String) -> String? raise @error
 pub async fn Client::get_bucket_inventory(Self, String, String) -> InventoryConfig? raise @error.ObsError
 pub async fn Client::get_bucket_lifecycle(Self, String) -> Array[LifecycleRule] raise @error.ObsError
 pub async fn Client::get_bucket_logging(Self, String) -> BucketLoggingStatus raise @error.ObsError
+pub async fn Client::get_bucket_notification(Self, String) -> NotificationConfig raise @error.ObsError
 pub async fn Client::get_bucket_object_lock(Self, String) -> ObjectLockConfig? raise @error.ObsError
 pub async fn Client::get_bucket_policy(Self, String) -> String? raise @error.ObsError
 pub async fn Client::get_bucket_quota(Self, String) -> Int64? raise @error.ObsError
@@ -118,6 +119,7 @@ pub async fn Client::put_bucket_encryption(Self, String, algorithm? : String) ->
 pub async fn Client::put_bucket_inventory(Self, String, InventoryConfig) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_lifecycle(Self, String, Array[LifecycleRule]) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_logging(Self, String, String, target_prefix? : String) -> Unit raise @error.ObsError
+pub async fn Client::put_bucket_notification(Self, String, NotificationConfig) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_object_lock(Self, String, ObjectLockConfig) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_policy(Self, String, String) -> Unit raise @error.ObsError
 pub async fn Client::put_bucket_replication(Self, String, ReplicationConfig) -> Unit raise @error.ObsError
@@ -223,6 +225,10 @@ pub(all) struct MultipartUploadListing {
   body : String
 }
 
+pub(all) struct NotificationConfig {
+  topics : Array[TopicNotification]
+}
+
 pub(all) struct ObjectAcl {
   grants : Array[Grant]
   owner_id : String?
@@ -316,6 +322,15 @@ pub(all) struct ReplicationRule {
   historical_object_replication : String
 }
 pub fn ReplicationRule::new(String, String, status? : String, prefix? : String) -> Self
+
+pub(all) struct TopicNotification {
+  id : String
+  filter_prefix : String
+  filter_suffix : String
+  topic : String
+  events : Array[String]
+}
+pub fn TopicNotification::new(String, String, Array[String], filter_prefix? : String, filter_suffix? : String) -> Self
 
 pub(all) struct UploadPartCopyResult {
   etag : String
