@@ -44,15 +44,13 @@ fn Client::presigned_url(
   expires_sec~ : Int64 = 600L,
   content_type~ : String = "",
 ) -> String raise @error.ObsError {
-  match self.config.credentials().security_token() {
-    Some(_) =>
-      raise @error.ObsError::BadParam(
-        "STS security tokens are not supported in presigned URLs yet",
-      )
-    None => ()
-  }
   let config = self.config
   let timestamp = @auth.iso8601_basic(@auth.now_millis())
+  let token_query : Array[(String, String)] = match
+    config.credentials().security_token() {
+    Some(token) => [("X-Amz-Security-Token", token)]
+    None => []
+  }
   let headers : Array[(String, String)] = [("host", config.host_of(bucket))]
   if !content_type.is_empty() {
     headers.push(("content-type", content_type))
@@ -62,7 +60,7 @@ fn Client::presigned_url(
     .presign_at(config.region_of(), timestamp, expires_sec, @auth.RequestToSign::{
       verb,
       canonical_uri: config.canonical_uri_of(bucket, key~),
-      query: [],
+      query: token_query,
       headers,
       payload_hash: @auth.unsigned_payload,
     })

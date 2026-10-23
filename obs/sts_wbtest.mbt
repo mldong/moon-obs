@@ -1,5 +1,5 @@
 ///|
-test "presigned URLs reject sts credentials instead of dropping the token" {
+test "presigned URLs carry the sts token in the signed query" {
   let credentials = @auth.Credentials::new("ak", "sk").with_security_token(
     "token-1",
   )
@@ -7,13 +7,8 @@ test "presigned URLs reject sts credentials instead of dropping the token" {
     "obs.cn-north-4.myhuaweicloud.com", "cn-north-4", credentials,
   )
   let client = Client::new(config, @transport.AsyncHttpTransport::new())
-  let mut rejected = false
-  let _ = client.presigned_get_url("b", "k") catch {
-    @error.ObsError::BadParam(_) => {
-      rejected = true
-      ""
-    }
-    _ => ""
+  let url = client.presigned_get_url("b", "k") catch {
+    _ => abort("presign must work with an sts token")
   }
-  assert_true(rejected)
+  assert_true(url.contains("token-1"))
 }
