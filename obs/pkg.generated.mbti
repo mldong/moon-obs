@@ -351,6 +351,9 @@ pub(all) struct ResumeUpload {
   etag : String?
   state : String
   error : String?
+  resume_upload_id : String
+  resume_offset : Int32
+  resume_parts : Array[(Int32, String)]
 }
 
 pub(all) struct TopicNotification {
@@ -361,6 +364,25 @@ pub(all) struct TopicNotification {
   events : Array[String]
 }
 pub fn TopicNotification::new(String, String, Array[String], filter_prefix? : String, filter_suffix? : String) -> Self
+
+pub struct TransferManager {
+  client : Client
+  bucket : String
+  part_size : Int32
+  threshold : Int32
+  progress : ((Int32, Int32) -> Unit)?
+  slot : Array[TransferState]
+}
+pub fn TransferManager::new(Client, String, part_size? : Int32, threshold? : Int32, progress? : ((Int32, Int32) -> Unit)?) -> Self
+pub fn TransferManager::restore(Client, String, TransferState, part_size? : Int32, threshold? : Int32, progress? : ((Int32, Int32) -> Unit)?) -> Self
+pub fn TransferManager::state(Self) -> TransferState
+pub async fn TransferManager::upload(Self, String, Bytes) -> ResumeUpload raise @error.ObsError
+
+pub(all) struct TransferState {
+  upload_id : String
+  offset : Int32
+  parts : Array[(Int32, String)]
+}
 
 pub(all) struct UploadPartCopyResult {
   etag : String
