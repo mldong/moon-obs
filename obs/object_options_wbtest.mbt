@@ -22,7 +22,7 @@ test "object headers carry storage class and checksum" {
 ///|
 test "content md5 matches a fixed vector" {
   assert_eq(
-    content_md5_of(@utf8.encode("abc".view())),
+    content_md5_of(@utf8.encode("abc".clamped_view())),
     "kAFQmDzST7DWlj99KOF/cg==",
   )
 }

@@ -92,7 +92,7 @@ fn stub_verb_name(verb : @transport.Method) -> String {
 ///|
 /// 一发的正文（计数与断言都用整串，桩件不切片）。
 fn stub_bytes(text : String) -> Bytes {
-  @utf8.encode(text.view())
+  @utf8.encode(text.clamped_view())
 }
 
 ///|

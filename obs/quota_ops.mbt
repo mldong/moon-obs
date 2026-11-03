@@ -25,7 +25,7 @@ pub async fn Client::set_bucket_quota(
     target,
     query=[("quota", "")],
     extra_headers=[("content-type", "application/xml")],
-    body=@transport.RequestBody::Bytes(@utf8.encode(document.view())),
+    body=@transport.RequestBody::Bytes(@utf8.encode(document.clamped_view())),
   )
   discard_body(response)
 }
@@ -82,7 +82,11 @@ fn parse_optional_int64(text : String?) -> Int64? {
       if value.is_empty() {
         None
       } else {
-        Some(@string.parse_int64(value.view(), base=10) catch { _ => 0L })
+        Some(
+          @string.parse_int64(value.clamped_view(), base=10) catch {
+            _ => 0L
+          },
+        )
       }
   }
 }

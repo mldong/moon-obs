@@ -22,7 +22,7 @@ pub async fn Client::put_bucket_website(
     bucket,
     query=[("website", "")],
     extra_headers=[("content-type", "application/xml")],
-    body=@transport.RequestBody::Bytes(@utf8.encode(document.view())),
+    body=@transport.RequestBody::Bytes(@utf8.encode(document.clamped_view())),
   )
   discard_body(response)
 }

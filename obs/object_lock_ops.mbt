@@ -39,7 +39,7 @@ pub async fn Client::put_bucket_object_lock(
     bucket,
     query=[("object-lock", "")],
     extra_headers=[("content-type", "application/xml")],
-    body=@transport.RequestBody::Bytes(@utf8.encode(document.view())),
+    body=@transport.RequestBody::Bytes(@utf8.encode(document.clamped_view())),
   )
   discard_body(response)
 }

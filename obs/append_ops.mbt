@@ -51,7 +51,11 @@ fn header_int64(headers : Array[@transport.Header], name : String) -> Int64? {
       if value.is_empty() {
         None
       } else {
-        Some(@string.parse_int64(value.view(), base=10) catch { _ => 0L })
+        Some(
+          @string.parse_int64(value.clamped_view(), base=10) catch {
+            _ => 0L
+          },
+        )
       }
   }
 }

@@ -15,7 +15,7 @@ pub async fn Client::put_bucket_policy(
     bucket,
     query=[("policy", "")],
     extra_headers=[("content-type", "application/json")],
-    body=@transport.RequestBody::Bytes(@utf8.encode(policy.view())),
+    body=@transport.RequestBody::Bytes(@utf8.encode(policy.clamped_view())),
   )
   discard_body(response)
 }

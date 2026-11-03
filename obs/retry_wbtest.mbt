@@ -55,14 +55,16 @@ test "资格表·四个幂等动词可重发，POST 三种形状与未知动词�
 test "重发资格·内存里的身体能倒带，流式身位是闸门" {
   assert_true(body_replayable(@transport.RequestBody::Empty))
   assert_true(
-    body_replayable(@transport.RequestBody::Bytes(@utf8.encode("x".view()))),
+    body_replayable(
+      @transport.RequestBody::Bytes(@utf8.encode("x".clamped_view())),
+    ),
   )
   // 资格层：身体能倒带的幂等动词才有 Allowed
   assert_true(
     resend_policy(
       "PUT",
       [],
-      @transport.RequestBody::Bytes(@utf8.encode("payload".view())),
+      @transport.RequestBody::Bytes(@utf8.encode("payload".clamped_view())),
     )
     is Resend::Allowed(_),
   )

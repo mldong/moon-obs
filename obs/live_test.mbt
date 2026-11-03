@@ -100,7 +100,7 @@ fn live_root() -> String raise @error.ObsError {
 
 ///|
 fn live_bytes(text : String) -> Bytes {
-  @utf8.encode(text.view())
+  @utf8.encode(text.clamped_view())
 }
 
 ///|
@@ -235,7 +235,7 @@ async fn live_open_url(
   url : String,
   verb~ : String = "GET",
   headers~ : Array[(String, String)] = [],
-  payload~ : Bytes = @utf8.encode("".view()),
+  payload~ : Bytes = @utf8.encode("".clamped_view()),
 ) -> (Int32, String) {
   let transport : &@transport.Transport = @transport.AsyncHttpTransport::new()
   let wire : Array[@transport.Header] = []
@@ -278,7 +278,7 @@ async fn live_open_retry(
   url : String,
   verb~ : String = "GET",
   headers~ : Array[(String, String)] = [],
-  payload~ : Bytes = @utf8.encode("".view()),
+  payload~ : Bytes = @utf8.encode("".clamped_view()),
 ) -> (Int32, String) {
   let mut last : (Int32, String) = (0, "尚未尝试")
   let mut attempt = 0
@@ -332,7 +332,7 @@ async fn live_probe(
   verb : String,
   query : Array[(String, String)],
   extra_headers~ : Array[(String, String)] = [],
-  payload~ : Bytes = @utf8.encode("".view()),
+  payload~ : Bytes = @utf8.encode("".clamped_view()),
   prefix~ : @auth.HeaderPrefix = @obs.signed_prefix,
 ) -> (Int32, String, String) raise @error.ObsError {
   let config = client.config_of()

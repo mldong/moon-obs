@@ -10,7 +10,7 @@ description = "Huawei Cloud OBS native protocol client for MoonBit"
 
 import {
   "mldong/moon-hutool@0.1.7",
-  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.7",
 }
 
 readme = "README.md"

@@ -17,7 +17,7 @@ pub async fn Client::put_object_tagging(
     key~,
     query=[("tagging", "")],
     extra_headers=[("content-type", "application/xml")],
-    body=@transport.RequestBody::Bytes(@utf8.encode(document.view())),
+    body=@transport.RequestBody::Bytes(@utf8.encode(document.clamped_view())),
   )
   discard_body(response)
 }

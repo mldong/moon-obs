@@ -140,7 +140,7 @@ pub(all) struct HeaderBlock {
 /// 所以"逐段编码 + 保留 `/`"与 `safe='/~'` 等价。
 pub fn encode_item(text : String, keep_slash~ : Bool = false) -> String {
   if !keep_slash {
-    return @percent.encode(text.view())
+    return @percent.encode(text.clamped_view())
   }
   let mut out = ""
   let mut first = true
@@ -416,12 +416,21 @@ pub fn signing_key(
   region : String,
 ) -> Bytes {
   let key0 = @digest.hmac_sha256_of_bytes(
-    @utf8.encode((v4_key_seed + secret_key).view()),
-    @utf8.encode(date.view()),
+    @utf8.encode((v4_key_seed + secret_key).clamped_view()),
+    @utf8.encode(date.clamped_view()),
   )
-  let key1 = @digest.hmac_sha256_of_bytes(key0, @utf8.encode(region.view()))
-  let key2 = @digest.hmac_sha256_of_bytes(key1, @utf8.encode(v4_service.view()))
-  @digest.hmac_sha256_of_bytes(key2, @utf8.encode(v4_request_marker.view()))
+  let key1 = @digest.hmac_sha256_of_bytes(
+    key0,
+    @utf8.encode(region.clamped_view()),
+  )
+  let key2 = @digest.hmac_sha256_of_bytes(
+    key1,
+    @utf8.encode(v4_service.clamped_view()),
+  )
+  @digest.hmac_sha256_of_bytes(
+    key2,
+    @utf8.encode(v4_request_marker.clamped_view()),
+  )
 }
 
 ///|
@@ -463,7 +472,7 @@ pub fn signature_of(
 ) -> String {
   @digest.hmac_sha256_hex_of_bytes(
     signing_key(secret_key, date, region),
-    @utf8.encode(string_to_sign.view()),
+    @utf8.encode(string_to_sign.clamped_view()),
   )
 }
 

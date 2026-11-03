@@ -142,7 +142,7 @@ pub async fn Client::complete_multipart_upload(
     query=[("uploadId", upload_id)],
     extra_headers=[("content-type", "application/xml")],
     body=@transport.RequestBody::Bytes(
-      @utf8.encode(complete_document(parts).view()),
+      @utf8.encode(complete_document(parts).clamped_view()),
     ),
   )
   let body = response_body_text(response.body, response.status)
@@ -185,7 +185,7 @@ fn complete_document(parts : Array[(Int32, String)]) -> String {
 
 ///|
 fn parse_int32(text : String) -> Int32 {
-  @string.parse_int(text.view(), base=10) catch {
+  @string.parse_int(text.clamped_view(), base=10) catch {
     _ => 0
   }
 }

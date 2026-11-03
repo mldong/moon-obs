@@ -54,7 +54,7 @@ pub async fn Client::put_bucket_inventory(
     bucket,
     query=[("inventory", ""), ("id", config.id)],
     extra_headers=[("content-type", "application/xml")],
-    body=@transport.RequestBody::Bytes(@utf8.encode(document.view())),
+    body=@transport.RequestBody::Bytes(@utf8.encode(document.clamped_view())),
   )
   discard_body(response)
 }

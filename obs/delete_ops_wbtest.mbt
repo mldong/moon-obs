@@ -11,7 +11,7 @@ test "delete_objects document escapes keys and honors quiet" {
 ///|
 test "delete_objects content-md5 matches a fixed vector" {
   let body = @utf8.encode(
-    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Delete><Object><Key>a</Key></Object></Delete>".view(),
+    "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Delete><Object><Key>a</Key></Object></Delete>".clamped_view(),
   )
   assert_eq(delete_objects_content_md5(body), "GHTHOIjEhEx8oyGUt4LWEg==")
 }

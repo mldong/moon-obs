@@ -22,7 +22,7 @@ pub async fn Client::put_bucket_cors(
     bucket,
     query=[("cors", "")],
     extra_headers=[("content-type", "application/xml")],
-    body=@transport.RequestBody::Bytes(@utf8.encode(document.view())),
+    body=@transport.RequestBody::Bytes(@utf8.encode(document.clamped_view())),
   )
   discard_body(response)
 }
@@ -126,7 +126,7 @@ fn parse_optional_int32(text : String?) -> Int32? {
       if value.is_empty() {
         None
       } else {
-        Some(@string.parse_int(value.view(), base=10) catch { _ => 0 })
+        Some(@string.parse_int(value.clamped_view(), base=10) catch { _ => 0 })
       }
   }
 }

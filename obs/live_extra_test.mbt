@@ -47,7 +47,7 @@ fn extra_tag() -> String {
 
 ///|
 fn extra_bytes(text : String) -> Bytes {
-  @utf8.encode(text.view())
+  @utf8.encode(text.clamped_view())
 }
 
 ///|

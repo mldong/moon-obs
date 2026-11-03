@@ -22,7 +22,7 @@ pub async fn Client::delete_objects(
     }
   }
   let document = delete_objects_document(keys, quiet)
-  let body = @utf8.encode(document.view())
+  let body = @utf8.encode(document.clamped_view())
   let content_md5 = delete_objects_content_md5(body)
   let response = request(
     self,

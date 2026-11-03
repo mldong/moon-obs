@@ -48,7 +48,8 @@ pub async fn Client::set_bucket_custom_domain(
     None => []
   }
   let payload = match body {
-    Some(text) => @transport.RequestBody::Bytes(@utf8.encode(text.view()))
+    Some(text) =>
+      @transport.RequestBody::Bytes(@utf8.encode(text.clamped_view()))
     None => @transport.RequestBody::Empty
   }
   let response = request(
