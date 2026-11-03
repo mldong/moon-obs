@@ -168,8 +168,10 @@ jobs:
 
       - name: Assert zero warnings
         run: |
+          set -euo pipefail
+          bash scripts/own-warn.sh --selftest
           moon check --target wasm --no-render 2>&1 | tee check.txt
-          ! grep -q "Warning" check.txt
+          [ "$(bash scripts/own-warn.sh check.txt)" = "0" ]
 
   publish:
     name: Publish mldong/moon-obs to mooncakes
