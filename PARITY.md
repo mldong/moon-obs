@@ -66,7 +66,7 @@
 |---|---|---|---|
 | OBS-SEC-001 | 临时凭据 / security token | 部分实现 | 请求头 + 预签名查询串（`X-Amz-Security-Token`）都已接；缺 STS 凭据未真桶 |
 | OBS-CNV-001 | 传输管理器（上传/下载/跨桶搬运） | `TransferManager::upload` `download` `copy_to`（持阈值/进度/续传状态） | 真桶已验证 | 2026-10-24 真桶绿：分片上传+进度、分片 Range 下载拼接、跨桶分片复制 |
-| OBS-CNV-002 | TransferManager / 分页器 / 重试策略 | 部分实现 | `list_all_objects` 翻页器已落并真桶绿；进度回调/断点续传未做，重试是操作级重发 |
+| OBS-CNV-002 | TransferManager / 分页器 / 重试策略 | 已实现 | 翻页器、进度回调（`progress~`）、断点续传（`put_bytes_resumable`）、`TransferManager` 上传/分片下载/跨桶搬运均已落且真桶绿（`live_extra_test.mbt` 三条「真桶·…」腿）；重试是请求层重发一次（仅幂等动词且身体可倒带，`request.mbt` + `retry_wbtest.mbt`） |
 
 ### P3 · 可选模块
 
