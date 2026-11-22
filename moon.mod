@@ -1,6 +1,6 @@
 name = "mldong/moon-obs"
 
-version = "0.20.1"
+version = "0.20.2"
 
 license = "Apache-2.0"
 
@@ -9,7 +9,7 @@ preferred_target = "wasm"
 description = "Huawei Cloud OBS native protocol client for MoonBit"
 
 import {
-  "mldong/moon-hutool@0.1.8",
+  "mldong/moon-hutool@0.1.9",
   "moonbitlang/async@0.22.7",
 }
 
