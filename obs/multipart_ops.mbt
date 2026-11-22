@@ -185,7 +185,7 @@ fn complete_document(parts : Array[(Int32, String)]) -> String {
 
 ///|
 fn parse_int32(text : String) -> Int32 {
-  @string.parse_int(text.clamped_view(), base=10) catch {
+  @string.parse_int(text.clamped_view(), radix=10) catch {
     _ => 0
   }
 }

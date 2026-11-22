@@ -83,7 +83,7 @@ fn parse_optional_int64(text : String?) -> Int64? {
         None
       } else {
         Some(
-          @string.parse_int64(value.clamped_view(), base=10) catch {
+          @string.parse_int64(value.clamped_view(), radix=10) catch {
             _ => 0L
           },
         )

@@ -310,7 +310,7 @@ fn meta_pairs(headers : Array[@transport.Header]) -> Array[(String, String)] {
 /// `0` 是"读不出"的哨兵而不是"大小是 0"：调用侧要真读数就看回包原文，
 /// 这里不静默造一个像真值的默认值。
 fn parse_int64(text : String) -> Int64 {
-  @string.parse_int64(text.clamped_view(), base=10) catch {
+  @string.parse_int64(text.clamped_view(), radix=10) catch {
     _ => 0L
   }
 }
